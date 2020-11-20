@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>树图</title>
+    <style>
+        #main{
+            margin: 20px;
+            width: 700px;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+<!--建立dom 容器-->
+<div id="main"></div>
+<!--引入echarts-->
+<script src="https://lib.baomitu.com/echarts/4.7.0/echarts.min.js"></script>
+<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+<script>
+    // 基于准备好的dom，初始化echarts实例
+    const myChart = echarts.init(document.getElementById('main'));
+    myChart.showLoading();//显示Loading标志
+    $.get('./data/flare.json', function (data) {
+    myChart.hideLoading();//得到数据后隐藏Loading标志
+    //间隔展开子数据，animate，display，physics，scale，vis是展开的
+    echarts.util.each(data.children, function (datum, index) {
+        index % 2 === 0 && (datum.collapsed = true);
+    });
+
+    myChart.setOption(option = {
+        // 标题
+        title:{
+            text:'树图',
+            textStyle:{
+                color:'maroon',
+                fontSize:30
+            },
+            left:'center',
+        },
+        tooltip: {
+            trigger: 'item',
+            triggerOn: 'mousemove'
+        },
+        series: [
+            {
+                type: 'tree',//树形结构
+                data: [data],
+                top: '10%',
+                left: '7%',
+                bottom: '1%',
+                right: '20%',
+                symbolSize: 7,//标记的大小，就是那个小圆圈
+                //每个节点所对应的标签的样式
+                label: { 
+                    position: 'left',//标签的位置
+                    verticalAlign: 'middle',//文字垂直对齐方式，默认自动。可选：top，middle，bottom
+                    align: 'right',//文字水平对齐方式，默认自动。可选：top，center，bottom
+                    fontSize: 9 //标签文字大小
+                },
+
+                leaves: {//叶子节点的特殊配置，
+                    label: {
+                        position: 'right',
+                        verticalAlign: 'middle',
+                        align: 'left'
+                    }
+                },
+
+                expandAndCollapse: true,//子树折叠和展开的交互，默认打开
+                animationDuration: 550,//初始动画的时长，支持回调函数,默认1000
+                animationDurationUpdate: 750//数据更新动画的时长，默认300
+            }
+        ]
+    });
+});
+</script>
+</body>
+</html>
